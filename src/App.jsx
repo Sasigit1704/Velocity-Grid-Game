@@ -284,10 +284,9 @@ export default function VelocityGrid() {
     }
   }, [score, gameState, gameMode, activeLevel, boardCells]);
 
- // SPAWNER LOGIC (Fixed for Production Build Speed Scaling)
+ // SPAWNER LOGIC (Bulletproof Interval-based scaling)
   useEffect(() => {
     if (gameState !== 'playing') return;
-    let timeoutId;
 
     const spawnHeat = () => {
       const randomRow = Math.floor(Math.random() * gridRows);
@@ -349,23 +348,28 @@ export default function VelocityGrid() {
         }
         return { ...currentBoard, [cellKey]: { type: 'heat', heatValue: incomingHeatVal, timeLeft: 5 } };
       });
+    };
 
-      // Calculate next speed dynamically using current score ref value on every tick
+    // Use a dynamic interval wrapper that recalculates speed on every single tick
+    let currentTimeout;
+    const runSpawnerLoop = () => {
+      spawnHeat();
+      
       let nextSpeed;
       if (gameMode === 'level') {
-        nextSpeed = currentLevelData.speed;
+        nextSpeed = LEVEL_DATA.find(l => l.id === activeLevel).speed;
       } else {
-        const liveScore = scoreRef.current; // Pulls absolute live score dynamically
+        const liveScore = scoreRef.current;
         nextSpeed = Math.max(600, 2800 - Math.floor(liveScore / 200) * 100);
       }
-      
-      timeoutId = setTimeout(spawnHeat, nextSpeed);
+
+      currentTimeout = setTimeout(runSpawnerLoop, nextSpeed);
     };
 
     const initialDelay = gameMode === 'level' ? LEVEL_DATA.find(l => l.id === activeLevel).speed : 2800;
-    timeoutId = setTimeout(spawnHeat, initialDelay);
-    
-    return () => clearTimeout(timeoutId);
+    currentTimeout = setTimeout(runSpawnerLoop, initialDelay);
+
+    return () => clearTimeout(currentTimeout);
   }, [gameState, gameMode, activeLevel, username]); 
 
   // 5-Second Explosion Timer Loop
