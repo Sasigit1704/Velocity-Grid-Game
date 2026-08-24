@@ -284,7 +284,7 @@ export default function VelocityGrid() {
     }
   }, [score, gameState, gameMode, activeLevel, boardCells]);
 
-  // SPAWNER LOGIC
+ // SPAWNER LOGIC (Fixed for Production Build Speed Scaling)
   useEffect(() => {
     if (gameState !== 'playing') return;
     let timeoutId;
@@ -350,20 +350,23 @@ export default function VelocityGrid() {
         return { ...currentBoard, [cellKey]: { type: 'heat', heatValue: incomingHeatVal, timeLeft: 5 } };
       });
 
+      // Calculate next speed dynamically using current score ref value on every tick
       let nextSpeed;
       if (gameMode === 'level') {
         nextSpeed = currentLevelData.speed;
       } else {
-        const currentScore = scoreRef.current;
-        nextSpeed = Math.max(600, 2800 - Math.floor(currentScore / 200) * 100);
+        const liveScore = scoreRef.current; // Pulls absolute live score dynamically
+        nextSpeed = Math.max(600, 2800 - Math.floor(liveScore / 200) * 100);
       }
       
       timeoutId = setTimeout(spawnHeat, nextSpeed);
     };
 
-    timeoutId = setTimeout(spawnHeat, gameMode === 'level' ? LEVEL_DATA.find(l => l.id === activeLevel).speed : 2800);
+    const initialDelay = gameMode === 'level' ? LEVEL_DATA.find(l => l.id === activeLevel).speed : 2800;
+    timeoutId = setTimeout(spawnHeat, initialDelay);
+    
     return () => clearTimeout(timeoutId);
-  }, [gameState, gameMode, activeLevel, highScore, username]); 
+  }, [gameState, gameMode, activeLevel, username]); 
 
   // 5-Second Explosion Timer Loop
   useEffect(() => {
