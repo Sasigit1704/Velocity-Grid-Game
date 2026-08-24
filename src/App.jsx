@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { initializeApp } from "firebase/app";
+import { Analytics } from "@vercel/analytics/react"
 import { getFirestore, collection, getDocs, setDoc, doc, query, orderBy, limit } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -911,7 +912,7 @@ export default function VelocityGrid() {
           })}
         </div>
       </div>
-
+      <Analytics />
     </div>
   );
 }
