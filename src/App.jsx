@@ -182,7 +182,7 @@ export default function VelocityGrid() {
   // Share score helper with live game link
     const handleShareScore = (customScore = score) => {
       playSound('click');
-      const gameUrl = "https://velocity_grid.vercel.app"; // <-- Drop your Vercel link here once live!
+      const gameUrl = "https://velocity-grid-game.vercel.app"; // <-- Drop your Vercel link here once live!
       const shareText = `🔥 Can you beat my score of ${customScore.toLocaleString()} in Velocity Grid? Play now and test your thermal defense reflexes! 🚀\n\nPlay here: ${gameUrl}`;
       
       navigator.clipboard.writeText(shareText).then(() => {
