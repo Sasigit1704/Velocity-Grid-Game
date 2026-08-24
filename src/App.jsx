@@ -360,7 +360,7 @@ export default function VelocityGrid() {
         nextSpeed = currentLevelData.speed;
       } else {
         const liveScore = scoreRef.current;
-        nextSpeed = Math.max(600, 2800 - Math.floor(liveScore / 200) * 100);
+        nextSpeed = Math.max(300, 2800 - Math.floor(liveScore / 200) * 100);
       }
 
       // Schedule the next execution recursively via ref tracker
