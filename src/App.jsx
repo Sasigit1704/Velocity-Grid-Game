@@ -284,11 +284,16 @@ export default function VelocityGrid() {
     }
   }, [score, gameState, gameMode, activeLevel, boardCells]);
 
- // SPAWNER LOGIC (Bulletproof Interval-based scaling)
-  useEffect(() => {
-    if (gameState !== 'playing') return;
+ // SPAWNER LOGIC (Completely decoupled using persistent ref loop)
+  const spawnerTimerRef = useRef(null);
 
-    const spawnHeat = () => {
+  useEffect(() => {
+    if (gameState !== 'playing') {
+      if (spawnerTimerRef.current) clearTimeout(spawnerTimerRef.current);
+      return;
+    }
+
+    const runSpawner = () => {
       const randomRow = Math.floor(Math.random() * gridRows);
       const randomCol = Math.floor(Math.random() * gridCols);
       const cellKey = `${randomRow}-${randomCol}`;
@@ -348,29 +353,27 @@ export default function VelocityGrid() {
         }
         return { ...currentBoard, [cellKey]: { type: 'heat', heatValue: incomingHeatVal, timeLeft: 5 } };
       });
-    };
 
-    // Use a dynamic interval wrapper that recalculates speed on every single tick
-    let currentTimeout;
-    const runSpawnerLoop = () => {
-      spawnHeat();
-      
+      // Calculate next speed dynamically based on live ref score
       let nextSpeed;
       if (gameMode === 'level') {
-        nextSpeed = LEVEL_DATA.find(l => l.id === activeLevel).speed;
+        nextSpeed = currentLevelData.speed;
       } else {
         const liveScore = scoreRef.current;
         nextSpeed = Math.max(600, 2800 - Math.floor(liveScore / 200) * 100);
       }
 
-      currentTimeout = setTimeout(runSpawnerLoop, nextSpeed);
+      // Schedule the next execution recursively via ref tracker
+      spawnerTimerRef.current = setTimeout(runSpawner, nextSpeed);
     };
 
     const initialDelay = gameMode === 'level' ? LEVEL_DATA.find(l => l.id === activeLevel).speed : 2800;
-    currentTimeout = setTimeout(runSpawnerLoop, initialDelay);
+    spawnerTimerRef.current = setTimeout(runSpawner, initialDelay);
 
-    return () => clearTimeout(currentTimeout);
-  }, [gameState, gameMode, activeLevel, username]); 
+    return () => {
+      if (spawnerTimerRef.current) clearTimeout(spawnerTimerRef.current);
+    };
+  }, [gameState, gameMode, activeLevel]); 
 
   // 5-Second Explosion Timer Loop
   useEffect(() => {
