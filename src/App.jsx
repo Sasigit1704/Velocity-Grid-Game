@@ -48,7 +48,7 @@ export default function VelocityGrid() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [tempUsername, setTempUsername] = useState('');
   const [pendingAction, setPendingAction] = useState(null); 
-  const [shareCopied, setShareCopied] = useState(false);
+  const [shareStatus, setShareStatus] = useState('');
   
   const [playerId] = useState(() => {
     let id = localStorage.getItem('velocity_player_id');
@@ -180,17 +180,81 @@ export default function VelocityGrid() {
     }
   };
 
-  // Share score helper with live game link
-    const handleShareScore = (customScore = score) => {
-      playSound('click');
-      const gameUrl = "https://velocity-grid-game.vercel.app"; // <-- Drop your Vercel link here once live!
-      const shareText = `🔥 Can you beat my score of ${customScore.toLocaleString()} in Velocity Grid? Play now and test your thermal defense reflexes! 🚀\n\nPlay here: ${gameUrl}`;
-      
-      navigator.clipboard.writeText(shareText).then(() => {
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
-      });
+  // Share score helper - works on Vercel, localhost and inside Itch.io iframe
+  const handleShareScore = async (customScore = score) => {
+    playSound('click');
+
+    // Share the published Itch.io game.
+    const gameUrl = "https://unusual-unique.itch.io/velocity-grid";
+    const shareText = `🔥 Can you beat my score of ${customScore.toLocaleString()} in Velocity Grid? Play now and test your thermal defense reflexes! 🚀`;
+    const fullShareText = `${shareText}
+
+Play here: ${gameUrl}`;
+
+    const showShareStatus = (message) => {
+      setShareStatus(message);
+      setTimeout(() => setShareStatus(''), 2500);
     };
+
+    // 1. Native Web Share (best on supported mobile browsers).
+    // If Itch.io blocks it inside the iframe, continue to the fallbacks.
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Velocity Grid',
+          text: shareText,
+          url: gameUrl
+        });
+        showShareStatus('shared');
+        return;
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+      }
+    }
+
+    // 2. Modern Clipboard API.
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(fullShareText);
+        showShareStatus('copied');
+        return;
+      }
+    } catch (error) {
+      // Itch.io iframe permissions may reject clipboard access.
+    }
+
+    // 3. Legacy copy fallback for embedded iframes.
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = fullShareText;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      textArea.setSelectionRange(0, textArea.value.length);
+
+      const copied = document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      if (copied) {
+        showShareStatus('copied');
+        return;
+      }
+    } catch (error) {
+      // Continue to the manual fallback.
+    }
+
+    // 4. Last-resort manual copy dialog so the button never silently fails.
+    try {
+      window.prompt('Copy your Velocity Grid score message:', fullShareText);
+      showShareStatus('manual');
+    } catch (error) {
+      showShareStatus('failed');
+    }
+  };
 
   // Menu Handlers
   const handleEndlessClick = () => {
@@ -572,7 +636,7 @@ export default function VelocityGrid() {
             onClick={() => handleShareScore(highScore)} 
             className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]"
           >
-            {shareCopied ? '✅ COPIED TO CLIPBOARD!' : '📤 SHARE BEST SCORE'}
+            {shareStatus === 'shared' ? '✅ SHARED!' : shareStatus === 'copied' ? '✅ COPIED!' : shareStatus === 'manual' ? '📋 COPY THE MESSAGE ABOVE' : '📤 SHARE BEST SCORE'}
           </button>
         </div>
         
@@ -779,7 +843,7 @@ export default function VelocityGrid() {
                 onClick={() => handleShareScore(score)}
                 className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] text-xs flex items-center justify-center gap-2"
               >
-                {shareCopied ? '✅ COPIED TO CLIPBOARD!' : '📤 SHARE THIS SCORE'}
+                {shareStatus === 'shared' ? '✅ SHARED!' : shareStatus === 'copied' ? '✅ COPIED!' : shareStatus === 'manual' ? '📋 COPY THE MESSAGE ABOVE' : '📤 SHARE THIS SCORE'}
               </button>
 
               <div className="flex gap-3">
