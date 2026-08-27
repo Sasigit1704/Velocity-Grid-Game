@@ -19,15 +19,15 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const LEVEL_DATA = [
-  { id: 1, target: 1000, time: 20, speed: 1900, bossChance: 0.15, desc: "Sector 1: Easy learning curve." },
-  { id: 2, target: 2000, time: 30, speed: 1800, bossChance: 0.18, desc: "Sector 2: Normal tempo pick up." },
-  { id: 3, target: 3200, time: 40, speed: 1700, bossChance: 0.20, desc: "Sector 3: Heat waves intensifying." },
-  { id: 4, target: 4500, time: 50, speed: 1600, bossChance: 0.22, desc: "Sector 4: Heavy thermal pressure." },
-  { id: 5, target: 6000, time: 60, speed: 1500, bossChance: 0.25, desc: "Sector 5: Mid-game endurance test." },
-  { id: 6, target: 7800, time: 70, speed: 1400, bossChance: 0.28, desc: "Sector 6: Harder tactical management." },
-  { id: 7, target: 9800, time: 80, speed: 1300,  bossChance: 0.30, desc: "Sector 7: Extreme speed chaos." },
-  { id: 8, target: 12000, time: 90, speed: 1200, bossChance: 0.32, desc: "Sector 8: Relentless core pressure." },
-  { id: 9, target: 14500, time: 100, speed: 1100, bossChance: 0.35, desc: "Sector 9: Insane frenzy mode." },
+  { id: 1, target: 1000, time: 25, speed: 1900, bossChance: 0.18, desc: "Sector 1: Easy learning curve." },
+  { id: 2, target: 2000, time: 35, speed: 1800, bossChance: 0.20, desc: "Sector 2: Normal tempo pick up." },
+  { id: 3, target: 3200, time: 45, speed: 1700, bossChance: 0.20, desc: "Sector 3: Heat waves intensifying." },
+  { id: 4, target: 4500, time: 55, speed: 1600, bossChance: 0.25, desc: "Sector 4: Heavy thermal pressure." },
+  { id: 5, target: 6000, time: 65, speed: 1500, bossChance: 0.28, desc: "Sector 5: Mid-game endurance test." },
+  { id: 6, target: 7800, time: 75, speed: 1400, bossChance: 0.30, desc: "Sector 6: Harder tactical management." },
+  { id: 7, target: 9800, time: 85, speed: 1300,  bossChance: 0.32, desc: "Sector 7: Extreme speed chaos." },
+  { id: 8, target: 12000, time: 90, speed: 1200, bossChance: 0.35, desc: "Sector 8: Relentless core pressure." },
+  { id: 9, target: 14500, time: 100, speed: 1100, bossChance: 0.38, desc: "Sector 9: Insane frenzy mode." },
   { id: 10, target: 18000, time: 115, speed: 1000, bossChance: 0.40, desc: "Sector 10: The ultimate thermal test." }
 ];
 
