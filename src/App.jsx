@@ -21,7 +21,7 @@ const db = getFirestore(app);
 const LEVEL_DATA = [
   { id: 1, target: 1000, time: 25, speed: 1900, bossChance: 0.18, desc: "Sector 1: Easy learning curve." },
   { id: 2, target: 2000, time: 35, speed: 1800, bossChance: 0.20, desc: "Sector 2: Normal tempo pick up." },
-  { id: 3, target: 3200, time: 45, speed: 1700, bossChance: 0.23, desc: "Sector 3: Heat waves intensifying." },
+  { id: 3, target: 3200, time: 45, speed: 1600, bossChance: 0.23, desc: "Sector 3: Heat waves intensifying." },
   { id: 4, target: 4500, time: 55, speed: 1600, bossChance: 0.25, desc: "Sector 4: Heavy thermal pressure." },
   { id: 5, target: 6000, time: 65, speed: 1500, bossChance: 0.28, desc: "Sector 5: Mid-game endurance test." },
   { id: 6, target: 7800, time: 75, speed: 1400, bossChance: 0.30, desc: "Sector 6: Harder tactical management." },
